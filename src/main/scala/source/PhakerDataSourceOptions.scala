@@ -6,23 +6,17 @@ import org.apache.flink.cdc.common.configuration.{ConfigOption, ConfigOptions}
 import java.lang
 
 object PhakerDataSourceOptions {
-  val NAMESPACE_NAME: ConfigOption[lang.String] = ConfigOptions
-    .key("namespace.name")
+  val TABLE_ID: ConfigOption[lang.String] = ConfigOptions
+    .key("table.id")
     .stringType()
     .noDefaultValue()
-    .withDescription("Namespace name of the simulated table.")
+    .withDescription("Table ID of the simulated table.")
 
-  val SCHEMA_NAME: ConfigOption[lang.String] = ConfigOptions
-    .key("schema.name")
+  val REJECTED_TYPES: ConfigOption[lang.String] = ConfigOptions
+    .key("rejected.types")
     .stringType()
-    .noDefaultValue()
-    .withDescription("Schema name of the simulated table.")
-
-  val TABLE_NAME: ConfigOption[lang.String] = ConfigOptions
-    .key("table.name")
-    .stringType()
-    .noDefaultValue()
-    .withDescription("Name of the simulated table.")
+    .defaultValue("")
+    .withDescription("Unwanted data types (). Separated with comma.")
 
   val SCHEMA_EVOLVE: ConfigOption[lang.Boolean] = ConfigOptions
     .key("schema.evolve")
@@ -36,8 +30,9 @@ object PhakerDataSourceOptions {
     .key("max.column.count")
     .intType()
     .defaultValue(50)
-    .withDescription("Max added columns count. No schema evolution events will be generated if this limit has exceeded. Defaults to 50.")
-
+    .withDescription(
+      "Max added columns count. No schema evolution events will be generated if this limit has exceeded. Defaults to 50."
+    )
 
   val BATCH_COUNT: ConfigOption[lang.Integer] = ConfigOptions
     .key("batch.count")
@@ -49,5 +44,7 @@ object PhakerDataSourceOptions {
     .key("sleep.time")
     .intType()
     .defaultValue(1000)
-    .withDescription("Sleep time for a while during each batch (in milliseconds). Defaults to 1000.")
+    .withDescription(
+      "Sleep time for a while during each batch (in milliseconds). Defaults to 1000."
+    )
 }

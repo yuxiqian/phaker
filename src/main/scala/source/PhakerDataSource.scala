@@ -5,9 +5,8 @@ import org.apache.flink.cdc.common.event.TableId
 import org.apache.flink.cdc.common.source.{DataSource, EventSourceProvider, FlinkSourceFunctionProvider, MetadataAccessor}
 
 class PhakerDataSource(
-    namespaceName: String,
-    schemaName: String,
-    tableName: String,
+    tableId: TableId,
+    rejectedTypes: Set[String],
     schemaEvolve: Boolean,
     maxColumnCount: Int,
     batchCount: Int,
@@ -16,7 +15,8 @@ class PhakerDataSource(
   override def getEventSourceProvider: EventSourceProvider = {
     FlinkSourceFunctionProvider.of(
       new PhakerSourceFunction(
-        TableId.tableId(namespaceName, schemaName, tableName),
+        tableId,
+        rejectedTypes,
         schemaEvolve,
         maxColumnCount,
         batchCount,
@@ -26,6 +26,6 @@ class PhakerDataSource(
   }
 
   override def getMetadataAccessor: MetadataAccessor = {
-    new PhakerMetadataAccessor(namespaceName, schemaName, tableName)
+    new PhakerMetadataAccessor(tableId)
   }
 }

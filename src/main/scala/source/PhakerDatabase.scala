@@ -4,6 +4,7 @@ package source
 import org.apache.flink.cdc.common.schema.{Column, Schema}
 import org.apache.flink.cdc.common.types.{DataType, DataTypes}
 
+import java.util
 object PhakerDatabase {
   val primaryKey: String = "id"
   var columnList: Array[(String, DataType)] = Array(
@@ -14,7 +15,7 @@ object PhakerDatabase {
 
   def genSchema: Schema = {
     PhakerDatabase.synchronized {
-      import java.util
+
       Schema
         .newBuilder()
         .setColumns(

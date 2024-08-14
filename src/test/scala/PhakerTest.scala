@@ -22,6 +22,7 @@ class PhakerTest extends AnyFunSuite {
   test("Phaker source test") {
     val source = new PhakerSourceFunction(
       TableId.tableId("default_namespace", "default_schema", "default_table"),
+      Set("IntType", "FloatType", "DoubleType"),
       true,
       17,
       17,
@@ -42,9 +43,8 @@ class PhakerTest extends AnyFunSuite {
     // Setup value source
     val sourceConfig = new Configuration
     sourceConfig
-      .set(PhakerDataSourceOptions.NAMESPACE_NAME, "default_namespace")
-      .set(PhakerDataSourceOptions.SCHEMA_NAME, "default_schema")
-      .set(PhakerDataSourceOptions.TABLE_NAME, "default_table")
+      .set(PhakerDataSourceOptions.TABLE_ID, "default_namespace.default_schema.default_table")
+      .set(PhakerDataSourceOptions.REJECTED_TYPES, "BinaryType,VarBinaryType")
       .set[java.lang.Integer](PhakerDataSourceOptions.BATCH_COUNT, 1)
       .set[java.lang.Integer](PhakerDataSourceOptions.MAX_COLUMN_COUNT, 50)
       .set[java.lang.Integer](PhakerDataSourceOptions.SLEEP_TIME, 1000)

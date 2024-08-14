@@ -9,30 +9,24 @@ import java.util
 import scala.collection.JavaConverters._
 
 class PhakerMetadataAccessor(
-    namespaceName: String,
-    schemaName: String,
-    tableName: String
+    tableId: TableId
 ) extends MetadataAccessor {
 
-  def apply(
-      namespaceName: String,
-      schemaName: String,
-      tableName: String
-  ): PhakerMetadataAccessor =
-    new PhakerMetadataAccessor(namespaceName, schemaName, tableName)
-
-  override def listNamespaces(): util.List[String] = List(namespaceName).asJava
+  override def listNamespaces(): util.List[String] = List(
+    tableId.getNamespace
+  ).asJava
 
   override def listSchemas(namespace: String): util.List[String] = {
-    if (namespace == namespaceName) List(schemaName) else List.empty[String]
+    if (namespace == tableId.getNamespace) List(tableId.getSchemaName)
+    else List.empty[String]
   }.asJava
 
   override def listTables(
       namespace: String,
       schema: String
   ): util.List[TableId] = {
-    if (namespace == namespaceName && schema == schemaName)
-      List(TableId.tableId(namespaceName, schemaName, tableName))
+    if (namespace == tableId.getNamespace && schema == tableId.getSchemaName)
+      List(tableId)
     else List.empty[TableId]
   }.asJava
 

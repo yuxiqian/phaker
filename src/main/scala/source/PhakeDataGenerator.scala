@@ -11,7 +11,7 @@ import java.time.{Instant, ZonedDateTime}
 import scala.util.Random
 
 object PhakeDataGenerator {
-  def randomType: DataType = {
+  def randomType(rejectedTypes: Set[String]): DataType = {
     val choices = List(
       DataTypes.BINARY(17 + Random.nextInt(100)),
       DataTypes.VARBINARY(17 + Random.nextInt(100)),
@@ -29,7 +29,7 @@ object PhakeDataGenerator {
       DataTypes.TIMESTAMP(Random.nextInt(10)),
       DataTypes.TIMESTAMP_TZ(Random.nextInt(10)),
       DataTypes.TIMESTAMP_LTZ(Random.nextInt(10))
-    )
+    ).filterNot(t => rejectedTypes.contains(t.getClass.getSimpleName))
     choices(Random.nextInt(choices.length))
   }
 

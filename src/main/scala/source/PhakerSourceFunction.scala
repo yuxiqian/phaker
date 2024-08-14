@@ -1,15 +1,18 @@
 package io.github.yuxiqian.phaker
 package source
 
-import source.PhakerDatabase.idCount
+import source.PhakerDatabase.{colCount, idCount}
 
 import org.apache.flink.cdc.common.event._
 import org.apache.flink.cdc.common.schema.Column
 import org.apache.flink.cdc.runtime.typeutils.BinaryRecordDataGenerator
 import org.apache.flink.streaming.api.functions.source.SourceFunction
 
+import java.util
+
 class PhakerSourceFunction(
     tableId: TableId,
+    rejectedTypes: Set[String],
     schemaEvolve: Boolean,
     maxColumnCount: Int,
     batchCount: Int,
@@ -54,19 +57,6 @@ class PhakerSourceFunction(
     }
   }
 
-  private def genRecord() = {
-    val generator = new BinaryRecordDataGenerator(
-      PhakerDatabase.columnList.map(_._2).toArray
-    )
-    val rowData = PhakerDatabase.columnList
-      .map(col => PhakeDataGenerator.randomData(col._1, col._2))
-
-    println(s"Generated data record: ${rowData.mkString("Array(", ", ", ")")}")
-    generator.generate(
-      rowData
-    )
-  }
-
   private def emitUpdateEvents(ctx: Context, count: Int): Unit = {
     for (_ <- 0 until count) {
       val updateBeforeData = genRecord()
@@ -83,6 +73,19 @@ class PhakerSourceFunction(
         DataChangeEvent.updateEvent(tableId, updateBeforeData, updateAfterData)
       )
     }
+  }
+
+  private def genRecord() = {
+    val generator = new BinaryRecordDataGenerator(
+      PhakerDatabase.columnList.map(_._2).toArray
+    )
+    val rowData = PhakerDatabase.columnList
+      .map(col => PhakeDataGenerator.randomData(col._1, col._2))
+
+    println(s"Generated data record: ${rowData.mkString("Array(", ", ", ")")}")
+    generator.generate(
+      rowData
+    )
   }
 
   private def emitDeleteEvents(ctx: Context, count: Int): Unit = {
@@ -103,7 +106,6 @@ class PhakerSourceFunction(
   }
 
   private def emitSchemaEvolutionEvents(ctx: Context): Unit = {
-    import source.PhakerDatabase.colCount
 
     if (!schemaEvolve) { return }
     if (colCount > maxColumnCount) {
@@ -116,10 +118,10 @@ class PhakerSourceFunction(
       colCount += 1
       s"column$colCount"
     }
-    val addedColumnType = PhakeDataGenerator.randomType
+    val addedColumnType = PhakeDataGenerator.randomType(rejectedTypes)
 
     PhakerDatabase.columnList.synchronized {
-      import java.util
+
       PhakerDatabase.columnList :+= (addedColumnName, addedColumnType)
       ctx.collect(
         new AddColumnEvent(
