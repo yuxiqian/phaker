@@ -13,5 +13,7 @@ libraryDependencies ++= Seq(
   "org.apache.flink" % "flink-cdc-runtime" % flinkCdcVersion,
   "org.scalatest" %% "scalatest" % "3.2.19" % Test,
   "org.apache.flink" % "flink-clients" % flinkVersion % Test,
-  "org.apache.flink" % "flink-streaming-java" % flinkVersion % Test
+  "org.apache.flink" % "flink-streaming-java" % flinkVersion % Test,
+  "org.apache.flink" % "flink-cdc-composer" % flinkCdcVersion % Test,
+  "org.apache.flink" % "flink-cdc-pipeline-connector-values" % flinkCdcVersion % Test
 )
