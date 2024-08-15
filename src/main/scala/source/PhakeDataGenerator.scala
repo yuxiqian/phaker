@@ -57,7 +57,7 @@ object PhakeDataGenerator {
       case varChar: VarCharType     => generateString(varChar.getLength)
       case decimal: DecimalType =>
         generateDecimal(decimal.getPrecision, decimal.getScale)
-      case time: TimeType           => generateTime()
+      case _: TimeType              => generateTime()
       case timestamp: TimestampType => generateTimestamp(timestamp.getPrecision)
       case zonedTimestamp: ZonedTimestampType =>
         generateZonedTimestamp(zonedTimestamp.getPrecision)
@@ -105,7 +105,8 @@ object PhakeDataGenerator {
   }
 
   private def generateDecimal(precision: Int, scale: Int): DecimalData = {
-    DecimalData.fromUnscaledLong(Random.nextLong, precision, scale)
+    val maxValue = Math.pow(10, precision - 1).toInt
+    DecimalData.fromUnscaledLong(Random.nextInt(maxValue), precision, scale)
   }
 
   private def generateTime(): Int = {

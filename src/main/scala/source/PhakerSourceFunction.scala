@@ -21,6 +21,8 @@ class PhakerSourceFunction(
 
   private type Context = SourceFunction.SourceContext[Event]
 
+  private var isRunning = true
+
   override def run(ctx: Context): Unit = {
 
     ctx.collect(
@@ -30,7 +32,7 @@ class PhakerSourceFunction(
       )
     )
 
-    while (true) {
+    while (isRunning) {
       PhakerDatabase.synchronized {
         println("Emitting insert events...")
         emitInsertEvents(ctx, batchCount)
@@ -75,19 +77,6 @@ class PhakerSourceFunction(
     }
   }
 
-  private def genRecord() = {
-    val generator = new BinaryRecordDataGenerator(
-      PhakerDatabase.columnList.map(_._2).toArray
-    )
-    val rowData = PhakerDatabase.columnList
-      .map(col => PhakeDataGenerator.randomData(col._1, col._2))
-
-    println(s"Generated data record: ${rowData.mkString("Array(", ", ", ")")}")
-    generator.generate(
-      rowData
-    )
-  }
-
   private def emitDeleteEvents(ctx: Context, count: Int): Unit = {
     for (_ <- 0 until count) {
       val deleteBeforeData = genRecord()
@@ -103,6 +92,19 @@ class PhakerSourceFunction(
         DataChangeEvent.deleteEvent(tableId, deleteBeforeData)
       )
     }
+  }
+
+  private def genRecord() = {
+    val generator = new BinaryRecordDataGenerator(
+      PhakerDatabase.columnList.map(_._2)
+    )
+    val rowData = PhakerDatabase.columnList
+      .map(col => PhakeDataGenerator.randomData(col._1, col._2))
+
+    println(s"Generated data record: ${rowData.mkString("Array(", ", ", ")")}")
+    generator.generate(
+      rowData
+    )
   }
 
   private def emitSchemaEvolutionEvents(ctx: Context): Unit = {
@@ -141,5 +143,7 @@ class PhakerSourceFunction(
     println(s"Done, new schema: ${PhakerDatabase.genSchema}")
   }
 
-  override def cancel(): Unit = {}
+  override def cancel(): Unit = {
+    isRunning = false
+  }
 }
