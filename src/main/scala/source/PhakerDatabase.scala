@@ -8,7 +8,7 @@ import java.util
 object PhakerDatabase {
   val primaryKey: String = "id"
   var columnList: Array[(String, DataType)] = Array(
-    (primaryKey, DataTypes.BIGINT)
+    (primaryKey, DataTypes.BIGINT.notNull)
   )
   var idCount: Long = 0
   var colCount = 0
