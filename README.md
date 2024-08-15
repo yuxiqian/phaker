@@ -13,8 +13,7 @@ source:
   rejected.types: BinaryType,VarBinaryType   # Exclude some data types if downstream could not handle them
   schema.evolve: true                        # Generate schema evolution events, too
   max.column.count: 50                       # limit maximum column count
-  batch.count: 17                            # how many data records should source emits in each batch
-  sleep.time: 1000                           # sleep duration (in ms) between two consecutive batches
+  records.per.second: 17                     # maximum records emitted each second
 ```
 
 ## example

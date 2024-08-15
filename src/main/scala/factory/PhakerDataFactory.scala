@@ -26,8 +26,7 @@ class PhakerDataFactory extends DataSourceFactory {
       conf.get(REJECTED_TYPES).split(',').toSet,
       conf.get(SCHEMA_EVOLVE),
       conf.get(MAX_COLUMN_COUNT),
-      conf.get(BATCH_COUNT),
-      conf.get(SLEEP_TIME)
+      conf.get(RECORDS_PER_SECOND)
     )
   }
 
@@ -42,8 +41,7 @@ class PhakerDataFactory extends DataSourceFactory {
       REJECTED_TYPES,
       SCHEMA_EVOLVE,
       MAX_COLUMN_COUNT,
-      BATCH_COUNT,
-      SLEEP_TIME
+      RECORDS_PER_SECOND
     ).asJava
   }
 }

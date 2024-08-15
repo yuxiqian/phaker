@@ -34,17 +34,11 @@ object PhakerDataSourceOptions {
       "Max added columns count. No schema evolution events will be generated if this limit has exceeded. Defaults to 50."
     )
 
-  val BATCH_COUNT: ConfigOption[lang.Integer] = ConfigOptions
-    .key("batch.count")
+  val RECORDS_PER_SECOND: ConfigOption[lang.Integer] = ConfigOptions
+    .key("records.per.second")
     .intType()
-    .defaultValue(17)
-    .withDescription("Data records to be generated per batch. Defaults to 17.")
-
-  val SLEEP_TIME: ConfigOption[lang.Integer] = ConfigOptions
-    .key("sleep.time")
-    .intType()
-    .defaultValue(1000)
+    .defaultValue(60)
     .withDescription(
-      "Sleep time for a while during each batch (in milliseconds). Defaults to 1000."
+      "Data records to be generated each second. Defaults to 60."
     )
 }

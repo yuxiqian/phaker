@@ -1,10 +1,12 @@
 package io.github.yuxiqian.phaker
 
 import factory.PhakerDataFactory
-import source.PhakerSourceFunction
+import source.{PhakerSourceFunction, PhakerSourceGenerator}
 
+import org.apache.flink.cdc.common.configuration.Configuration
 import org.apache.flink.cdc.common.event.TableId
-import org.apache.flink.cdc.composer.definition.{SinkDef, SourceDef}
+import org.apache.flink.cdc.common.pipeline.PipelineOptions
+import org.apache.flink.cdc.composer.definition.{PipelineDef, SinkDef, SourceDef}
 import org.apache.flink.cdc.composer.flink.FlinkPipelineComposer
 import org.apache.flink.cdc.connectors.values.factory.ValuesDataFactory
 import org.apache.flink.cdc.connectors.values.sink.{ValuesDataSink, ValuesDataSinkOptions}
@@ -13,21 +15,20 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class PhakerTest extends AnyFunSuite {
 
-  import org.apache.flink.cdc.common.configuration.Configuration
-  import org.apache.flink.cdc.common.pipeline.PipelineOptions
-  import org.apache.flink.cdc.composer.definition.PipelineDef
-
   import java.util.Collections
 
   test("Phaker source test") {
+
     val source = new PhakerSourceFunction(
-      TableId.tableId("default_namespace", "default_schema", "default_table"),
-      Set("IntType", "FloatType", "DoubleType"),
-      true,
-      17,
-      17,
+      new PhakerSourceGenerator(
+        TableId.tableId("default_namespace", "default_schema", "default_table"),
+        Set("IntType", "FloatType", "DoubleType"),
+        true,
+        17
+      ),
       1000
     )
+
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.addSource(source).print().setParallelism(1)
     env.execute("Let's Test Phaker Source...")
@@ -43,11 +44,13 @@ class PhakerTest extends AnyFunSuite {
     // Setup value source
     val sourceConfig = new Configuration
     sourceConfig
-      .set(PhakerDataSourceOptions.TABLE_ID, "default_namespace.default_schema.default_table")
+      .set(
+        PhakerDataSourceOptions.TABLE_ID,
+        "default_namespace.default_schema.default_table"
+      )
       .set(PhakerDataSourceOptions.REJECTED_TYPES, "BinaryType,VarBinaryType")
-      .set[java.lang.Integer](PhakerDataSourceOptions.BATCH_COUNT, 1)
+      .set[java.lang.Integer](PhakerDataSourceOptions.RECORDS_PER_SECOND, 1)
       .set[java.lang.Integer](PhakerDataSourceOptions.MAX_COLUMN_COUNT, 50)
-      .set[java.lang.Integer](PhakerDataSourceOptions.SLEEP_TIME, 1000)
 
     val sourceDef =
       new SourceDef(PhakerDataFactory.IDENTIFIER, "Value Source", sourceConfig)

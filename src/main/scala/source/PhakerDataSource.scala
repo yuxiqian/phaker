@@ -9,18 +9,18 @@ class PhakerDataSource(
     rejectedTypes: Set[String],
     schemaEvolve: Boolean,
     maxColumnCount: Int,
-    batchCount: Int,
-    sleepTime: Int
+    recordsPerSecond: Int
 ) extends DataSource {
   override def getEventSourceProvider: EventSourceProvider = {
     FlinkSourceFunctionProvider.of(
       new PhakerSourceFunction(
-        tableId,
-        rejectedTypes,
-        schemaEvolve,
-        maxColumnCount,
-        batchCount,
-        sleepTime
+        new PhakerSourceGenerator(
+          tableId,
+          rejectedTypes,
+          schemaEvolve,
+          maxColumnCount
+        ),
+        recordsPerSecond
       )
     )
   }
