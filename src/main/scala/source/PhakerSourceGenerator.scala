@@ -14,10 +14,18 @@ class PhakerSourceGenerator(
     tableId: TableId,
     rejectedTypes: Set[String],
     schemaEvolve: Boolean,
+    generateNonNullColumns: Boolean,
     maxColumnCount: Int
 ) extends RandomGenerator[Event] {
 
   private val cachedEvents: util.List[Event] = {
+    if (!schemaEvolve) {
+      PhakerDatabase.columnList ++=
+        PhakeDataGenerator
+          .possibleChoices(rejectedTypes)
+          .zipWithIndex
+          .map(t => (s"column${t._2}_${t._1.getClass.getSimpleName}", t._1))
+    }
     val cache = new util.ArrayList[Event]
     cache.add(
       new CreateTableEvent(
@@ -114,12 +122,13 @@ class PhakerSourceGenerator(
 
     println("Emitting schema change events...")
 
+    val addedColumnType =
+      PhakeDataGenerator.randomType(rejectedTypes, generateNonNullColumns)
+
     val addedColumnName = colCount.synchronized {
       colCount += 1
-      s"column$colCount"
+      s"column${colCount}_${addedColumnType.getClass.getSimpleName}"
     }
-    val addedColumnType = PhakeDataGenerator.randomType(rejectedTypes)
-
     PhakerDatabase.columnList.synchronized {
       PhakerDatabase.columnList :+= (addedColumnName, addedColumnType)
       println(s"Done, new schema: ${PhakerDatabase.genSchema}")

@@ -25,6 +25,7 @@ class PhakerDataFactory extends DataSourceFactory {
       TableId.parse(conf.get(TABLE_ID)),
       conf.get(REJECTED_TYPES).split(',').toSet,
       conf.get(SCHEMA_EVOLVE),
+      conf.get(NON_NULL_COLUMNS),
       conf.get(MAX_COLUMN_COUNT),
       conf.get(RECORDS_PER_SECOND)
     )
@@ -40,6 +41,7 @@ class PhakerDataFactory extends DataSourceFactory {
     Set[ConfigOption[_]](
       REJECTED_TYPES,
       SCHEMA_EVOLVE,
+      NON_NULL_COLUMNS,
       MAX_COLUMN_COUNT,
       RECORDS_PER_SECOND
     ).asJava

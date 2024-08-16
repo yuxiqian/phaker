@@ -24,9 +24,10 @@ class PhakerTest extends AnyFunSuite {
         TableId.tableId("default_namespace", "default_schema", "default_table"),
         Set("IntType", "FloatType", "DoubleType"),
         true,
+        true,
         17
       ),
-      1000
+      1
     )
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -50,6 +51,8 @@ class PhakerTest extends AnyFunSuite {
       )
       .set(PhakerDataSourceOptions.REJECTED_TYPES, "BinaryType,VarBinaryType")
       .set[java.lang.Integer](PhakerDataSourceOptions.RECORDS_PER_SECOND, 1)
+      .set[java.lang.Boolean](PhakerDataSourceOptions.NON_NULL_COLUMNS, true)
+      .set[java.lang.Boolean](PhakerDataSourceOptions.SCHEMA_EVOLVE, true)
       .set[java.lang.Integer](PhakerDataSourceOptions.MAX_COLUMN_COUNT, 50)
 
     val sourceDef =

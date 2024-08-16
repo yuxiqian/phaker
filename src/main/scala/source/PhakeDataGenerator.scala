@@ -11,8 +11,9 @@ import java.time.{Instant, ZonedDateTime}
 import scala.util.Random
 
 object PhakeDataGenerator {
-  def randomType(rejectedTypes: Set[String]): DataType = {
-    val choices = List(
+
+  def possibleChoices(rejectedTypes: Set[String]): List[DataType] = {
+    List(
       DataTypes.BINARY(17 + Random.nextInt(100)),
       DataTypes.VARBINARY(17 + Random.nextInt(100)),
       DataTypes.BOOLEAN,
@@ -30,10 +31,25 @@ object PhakeDataGenerator {
       DataTypes.TIMESTAMP_TZ(Random.nextInt(10)),
       DataTypes.TIMESTAMP_LTZ(Random.nextInt(10))
     ).filterNot(t => rejectedTypes.contains(t.getClass.getSimpleName))
-    choices(Random.nextInt(choices.length))
+  }
+
+  def randomType(
+      rejectedTypes: Set[String],
+      generateNonNullColumns: Boolean
+  ): DataType = {
+    val choices = possibleChoices(rejectedTypes)
+    val resultType = choices(Random.nextInt(choices.length))
+    if (generateNonNullColumns && Random.nextBoolean()) {
+      resultType.notNull
+    } else {
+      resultType.nullable
+    }
   }
 
   def randomData(name: String, dataType: DataType): AnyRef = {
+    if (dataType.isNullable && Random.nextBoolean()) {
+      return null
+    }
     if (name == PhakerDatabase.primaryKey) {
       return idCount
         .synchronized {

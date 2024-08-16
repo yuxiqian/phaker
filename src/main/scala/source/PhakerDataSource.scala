@@ -8,6 +8,7 @@ class PhakerDataSource(
     tableId: TableId,
     rejectedTypes: Set[String],
     schemaEvolve: Boolean,
+    generateNonNullColumns: Boolean,
     maxColumnCount: Int,
     recordsPerSecond: Int
 ) extends DataSource {
@@ -18,6 +19,7 @@ class PhakerDataSource(
           tableId,
           rejectedTypes,
           schemaEvolve,
+          generateNonNullColumns,
           maxColumnCount
         ),
         recordsPerSecond

@@ -26,6 +26,14 @@ object PhakerDataSourceOptions {
       "Whether generate schema evolution events occasionally. Defaults to true."
     )
 
+  val NON_NULL_COLUMNS: ConfigOption[lang.Boolean] = ConfigOptions
+    .key("non.null.columns")
+    .booleanType()
+    .defaultValue(false)
+    .withDescription(
+      "Whether generating non-nullable columns into downstream."
+    )
+
   val MAX_COLUMN_COUNT: ConfigOption[lang.Integer] = ConfigOptions
     .key("max.column.count")
     .intType()
