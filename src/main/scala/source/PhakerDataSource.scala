@@ -15,13 +15,11 @@ class PhakerDataSource(
   override def getEventSourceProvider: EventSourceProvider = {
     FlinkSourceFunctionProvider.of(
       new PhakerSourceFunction(
-        new PhakerSourceGenerator(
-          tableId,
-          rejectedTypes,
-          schemaEvolve,
-          generateNonNullColumns,
-          maxColumnCount
-        ),
+        tableId,
+        rejectedTypes,
+        schemaEvolve,
+        generateNonNullColumns,
+        maxColumnCount,
         recordsPerSecond
       )
     )

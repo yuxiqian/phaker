@@ -3,9 +3,11 @@ package source
 
 import source.PhakerDatabase.{colCount, idCount}
 
+import org.apache.flink.api.common.functions.RuntimeContext
 import org.apache.flink.cdc.common.event._
 import org.apache.flink.cdc.common.schema.Column
 import org.apache.flink.cdc.runtime.typeutils.BinaryRecordDataGenerator
+import org.apache.flink.runtime.state.FunctionInitializationContext
 import org.apache.flink.streaming.api.functions.source.datagen.RandomGenerator
 
 import java.util
@@ -18,22 +20,31 @@ class PhakerSourceGenerator(
     maxColumnCount: Int
 ) extends RandomGenerator[Event] {
 
-  private val cachedEvents: util.List[Event] = {
+  private val cachedEvents = new util.ArrayList[Event]();
+
+  override def open(
+      name: String,
+      context: FunctionInitializationContext,
+      runtimeContext: RuntimeContext
+  ): Unit = {
+    super.open(name, context, runtimeContext)
     if (!schemaEvolve) {
-      PhakerDatabase.columnList ++=
-        PhakeDataGenerator
-          .possibleChoices(rejectedTypes)
-          .zipWithIndex
-          .map(t => (s"column${t._2}_${t._1.getClass.getSimpleName}", t._1))
+      PhakerDatabase.columnList.synchronized {
+        PhakerDatabase.columnList ++=
+          PhakeDataGenerator
+            .possibleChoices(rejectedTypes)
+            .zipWithIndex
+            .map(t =>
+              (s"column${t._2 + 1}_${t._1.getClass.getSimpleName}", t._1)
+            )
+      }
     }
-    val cache = new util.ArrayList[Event]
-    cache.add(
+    cachedEvents.add(
       new CreateTableEvent(
         tableId,
         PhakerDatabase.genSchema
       )
     )
-    cache
   }
 
   override def next(): Event = {
@@ -47,8 +58,6 @@ class PhakerSourceGenerator(
 
   private def pushEvents(): Unit = {
     PhakerDatabase.synchronized {
-      println("Emitting insert events...")
-
       {
         val insertedData = genRecord()
         cachedEvents.add(
@@ -102,12 +111,16 @@ class PhakerSourceGenerator(
 
   private def genRecord() = {
     val generator = new BinaryRecordDataGenerator(
-      PhakerDatabase.columnList.map(_._2)
+      PhakerDatabase.columnList.synchronized {
+        PhakerDatabase.columnList.map(_._2)
+      }
     )
     val rowData = PhakerDatabase.columnList
       .map(col => PhakeDataGenerator.randomData(col._1, col._2))
 
-    println(s"Generated data record: ${rowData.mkString("Array(", ", ", ")")}")
+    println(
+      s"Generated data record (${rowData.length}): ${rowData.mkString("Array(", ", ", ")")}"
+    )
     generator.generate(
       rowData
     )

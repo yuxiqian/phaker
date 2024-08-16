@@ -1,7 +1,7 @@
 package io.github.yuxiqian.phaker
 
 import factory.PhakerDataFactory
-import source.{PhakerSourceFunction, PhakerSourceGenerator}
+import source.PhakerSourceFunction
 
 import org.apache.flink.cdc.common.configuration.Configuration
 import org.apache.flink.cdc.common.event.TableId
@@ -20,18 +20,16 @@ class PhakerTest extends AnyFunSuite {
   test("Phaker source test") {
 
     val source = new PhakerSourceFunction(
-      new PhakerSourceGenerator(
-        TableId.tableId("default_namespace", "default_schema", "default_table"),
-        Set("IntType", "FloatType", "DoubleType"),
-        true,
-        true,
-        17
-      ),
+      TableId.tableId("default_namespace", "default_schema", "default_table"),
+      Set("IntType", "FloatType", "DoubleType"),
+      false,
+      true,
+      17,
       1
     )
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
-    env.addSource(source).print().setParallelism(1)
+    env.addSource(source).setParallelism(1).print().setParallelism(1)
     env.execute("Let's Test Phaker Source...")
   }
 
@@ -52,7 +50,7 @@ class PhakerTest extends AnyFunSuite {
       .set(PhakerDataSourceOptions.REJECTED_TYPES, "BinaryType,VarBinaryType")
       .set[java.lang.Integer](PhakerDataSourceOptions.RECORDS_PER_SECOND, 1)
       .set[java.lang.Boolean](PhakerDataSourceOptions.NON_NULL_COLUMNS, true)
-      .set[java.lang.Boolean](PhakerDataSourceOptions.SCHEMA_EVOLVE, true)
+      .set[java.lang.Boolean](PhakerDataSourceOptions.SCHEMA_EVOLVE, false)
       .set[java.lang.Integer](PhakerDataSourceOptions.MAX_COLUMN_COUNT, 50)
 
     val sourceDef =
