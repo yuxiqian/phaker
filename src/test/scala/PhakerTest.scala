@@ -36,7 +36,7 @@ class PhakerTest extends AnyFunSuite {
   test("Phaker to Values test") {
     import source.PhakerDataSourceOptions
 
-    import org.apache.flink.cdc.composer.definition.{RouteDef, TransformDef}
+    import org.apache.flink.cdc.composer.definition.{RouteDef, TransformDef, UdfDef}
 
     val composer = FlinkPipelineComposer.ofMiniCluster
 
@@ -74,6 +74,7 @@ class PhakerTest extends AnyFunSuite {
       sinkDef,
       Collections.emptyList[RouteDef],
       Collections.emptyList[TransformDef],
+      Collections.emptyList[UdfDef],
       pipelineConfig
     )
 
