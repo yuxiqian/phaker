@@ -4,7 +4,7 @@ version := "0.1.0-SNAPSHOT"
 scalaVersion := "2.12.19"
 
 val flinkVersion = "1.20.0"
-val flinkCdcVersion = "3.2.0"
+val flinkCdcVersion = "3.2.1"
 
 libraryDependencies ++= Seq(
   "org.apache.flink" % "flink-runtime" % flinkVersion % "provided",
