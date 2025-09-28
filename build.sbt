@@ -1,10 +1,10 @@
 name := "flink-cdc-pipeline-connector-phaker"
 idePackagePrefix := Some("io.github.yuxiqian.phaker")
-version := "0.1.0-SNAPSHOT"
+version := "0.1.1-SNAPSHOT"
 scalaVersion := "2.12.19"
 
-val flinkVersion = "1.20.0"
-val flinkCdcVersion = "3.2.1"
+val flinkVersion = "1.20.3"
+val flinkCdcVersion = "3.5.0"
 
 libraryDependencies ++= Seq(
   "org.apache.flink" % "flink-runtime" % flinkVersion % "provided",

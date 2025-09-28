@@ -7,7 +7,7 @@ import org.apache.flink.cdc.common.data._
 import org.apache.flink.cdc.common.data.binary.BinaryStringData
 import org.apache.flink.cdc.common.types._
 
-import java.time.{Instant, ZonedDateTime}
+import java.time.{Instant, LocalDate, LocalTime, ZonedDateTime}
 import scala.util.Random
 
 object PhakeDataGenerator {
@@ -26,6 +26,7 @@ object PhakeDataGenerator {
       DataTypes.CHAR(17 + Random.nextInt(100)),
       DataTypes.VARCHAR(17 + Random.nextInt(100)),
       DataTypes.DECIMAL(9 + Random.nextInt(8), Random.nextInt(8)),
+      DataTypes.DATE,
       DataTypes.TIME(Random.nextInt(10)),
       DataTypes.TIMESTAMP(Random.nextInt(10)),
       DataTypes.TIMESTAMP_TZ(Random.nextInt(10)),
@@ -73,6 +74,7 @@ object PhakeDataGenerator {
       case varChar: VarCharType     => generateString(varChar.getLength)
       case decimal: DecimalType =>
         generateDecimal(decimal.getPrecision, decimal.getScale)
+      case _: DateType              => generateDate()
       case _: TimeType              => generateTime()
       case timestamp: TimestampType => generateTimestamp(timestamp.getPrecision)
       case zonedTimestamp: ZonedTimestampType =>
@@ -125,8 +127,12 @@ object PhakeDataGenerator {
     DecimalData.fromUnscaledLong(Random.nextInt(maxValue), precision, scale)
   }
 
-  private def generateTime(): Int = {
-    System.currentTimeMillis.toInt
+  private def generateDate(): DateData = {
+    DateData.fromLocalDate(LocalDate.now)
+  }
+
+  private def generateTime(): TimeData = {
+    TimeData.fromLocalTime(LocalTime.now)
   }
 
   private def generateTimestamp(precision: Int): TimestampData = {
